@@ -3,6 +3,7 @@
 #include <pcap.h>
 #include <stdio.h>
 #include "Airodump.h"
+#include "Display.h"
 
 void usage() {
     printf("syntax: airodump <interface>\n");

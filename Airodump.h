@@ -2,31 +2,42 @@
 
 #pragma once
 
-#include <sys/types.h>
 #include <map>
 #include "mac.h"
 
 struct ieee80211_radiotap_header {
-        u_int8_t        it_version;     /* set to 0 */
-        u_int8_t        it_pad;
-        u_int16_t       it_len;         /* entire length */
-        u_int32_t       it_present;     /* fields present */
+    uint8_t   it_version;     /* set to 0 */
+    uint8_t   it_pad;
+    uint16_t  it_len;         /* entire length */
+    uint32_t  it_present;     /* fields present */
 } __attribute__((__packed__));
 
-struct ieee80211_frame
+struct beacon_frame
 {
     const static u_int8_t BEACON_FRAME_TYPE = 0x80;
 
-    u_int8_t  type;
-    u_int8_t  padding[3];
-    u_int8_t  dst[6];
-    u_int8_t  src[6];
-    u_int8_t  bssid[6];
-    u_int8_t  padding2[2];
+    uint8_t   type;
+    uint8_t   flags;
+    uint16_t  duration;
+    uint8_t   receiver[6];
+    uint8_t   transmitter[6];
+    uint8_t   bssid[6];
+    uint16_t  seq;
+
+    // fixed parameters
+    uint64_t  timestamp;
+    uint16_t  interval;
+    uint16_t  capabilities;
+
+    // tagged parameters
+    // 여기서 부터는 가변적
+    uint8_t   num;
+    uint8_t   len;
+    uint8_t   ssid;
 } __attribute__((__packed__));
 
 typedef struct ieee80211_radiotap_header RadiotapHdr;
-typedef struct ieee80211_frame Frame;
+typedef struct beacon_frame BeaconFrame;
 typedef struct Mac Mac;
 
 void airodump(const u_char* packet, u_int len);
