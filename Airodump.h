@@ -3,7 +3,7 @@
 #pragma once
 
 #include <sys/types.h>
-#include <arpa/inet.h>
+#include <map>
 #include "mac.h"
 
 struct ieee80211_radiotap_header {
@@ -15,6 +15,8 @@ struct ieee80211_radiotap_header {
 
 struct ieee80211_frame
 {
+    const static u_int8_t BEACON_FRAME_TYPE = 0x80;
+
     u_int8_t  type;
     u_int8_t  padding[3];
     u_int8_t  dst[6];

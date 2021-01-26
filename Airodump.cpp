@@ -6,18 +6,11 @@
 void airodump(const u_char* packet, u_int len)
 {
     RadiotapHdr* radiotapHdr = (RadiotapHdr*)packet;
-
     uint16_t radiotapHdrLen = radiotapHdr->it_len;
-    printf("%d\n", radiotapHdrLen);
+    Frame* frame = (Frame*)(packet+radiotapHdrLen);
 
-    u_char* frame = (u_char*)(packet+radiotapHdrLen);
+    if(frame->type != Frame::BEACON_FRAME_TYPE)
+        return;
 
-    for(int i = 0; i < 10; i++)
-    {
-        printf("%02x ", frame[i] );
-    }
-    printf("\n");
-
-    //Mac mac(frame->bssid);
-    //std::cout << mac << std::endl;
+    Mac bssid(frame->bssid);
 }
