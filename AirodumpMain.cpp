@@ -2,6 +2,7 @@
 
 #include <pcap.h>
 #include <stdio.h>
+#include "Airodump.h"
 
 void usage() {
     printf("syntax: airodump <interface>\n");
@@ -32,6 +33,7 @@ int main(int argc, char* argv[]) {
             break;
         }
         printf("%u bytes captured\n", header->caplen);
+        airodump(packet, header->caplen);
     }
 
     pcap_close(handle);
