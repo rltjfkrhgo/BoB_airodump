@@ -3,7 +3,6 @@
 #include <pcap.h>
 #include <stdio.h>
 #include "Airodump.h"
-#include "Display.h"
 
 void usage() {
     printf("syntax: airodump <interface>\n");
@@ -25,6 +24,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    time_t  prev = time(NULL);
+
     while (true) {
         struct pcap_pkthdr* header;
         const u_char* packet;
@@ -34,9 +35,15 @@ int main(int argc, char* argv[]) {
             printf("pcap_next_ex return %d(%s)\n", res, pcap_geterr(handle));
             break;
         }
-        
         airodump(packet, header->caplen);
-    }
 
+        time_t  now = time(NULL);
+        if(now - prev > 1)
+        {
+            display();
+            prev = now;
+        }
+    }
+    
     pcap_close(handle);
 }

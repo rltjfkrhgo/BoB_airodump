@@ -16,11 +16,25 @@ void airodump(const u_char* packet, u_int len)
     // Beacon Frame processing...
     BeaconFrame* beacon = (BeaconFrame*)(packet+offset);
     Mac bssid(beacon->bssid);
-    
-    char ssid[256];
-    uint8_t ssidLen = beacon->len;
-    memcpy(ssid, &(beacon->ssid), ssidLen);
-    ssid[ssidLen] = '\0';
 
-    std::cout << std::string(bssid) << "\t" << ssid << std::endl;
+    auto iter = map.find(bssid);
+    if(iter == map.end())  // 없다면
+    {
+        Stat* ptr = &map[bssid];
+        memcpy(ptr->ssid, &(beacon->ssid), beacon->len);
+        ptr->ssid[beacon->len] = '\0';
+    }
+    else
+    {
+
+    }
+}
+
+void display()
+{
+    std::cout << "BSSID\t\t\tESSID\n";
+    for(auto it = map.begin(); it != map.end(); it++)
+    {
+        std::cout << std::string(it->first) << "\t" << it->second.ssid << std::endl;
+    }
 }

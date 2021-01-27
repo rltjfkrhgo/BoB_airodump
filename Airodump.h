@@ -36,8 +36,17 @@ struct beacon_frame
     uint8_t   ssid;
 } __attribute__((__packed__));
 
+typedef struct
+{
+    char ssid[256];
+}
+Stat;
+
 typedef struct ieee80211_radiotap_header RadiotapHdr;
 typedef struct beacon_frame BeaconFrame;
 typedef struct Mac Mac;
 
+static std::map<Mac, Stat> map;
+
 void airodump(const u_char* packet, u_int len);
+void display();
