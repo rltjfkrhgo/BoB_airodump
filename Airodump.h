@@ -14,7 +14,7 @@ struct ieee80211_radiotap_header {
 
 struct beacon_frame
 {
-    const static u_int8_t BEACON_FRAME_TYPE = 0x80;
+    const static uint8_t BEACON_FRAME_TYPE = 0x80;
 
     uint8_t   type;
     uint8_t   flags;
@@ -36,6 +36,19 @@ struct beacon_frame
     uint8_t   ssid;
 } __attribute__((__packed__));
 
+struct data_frame
+{
+    const static uint8_t DATA_FRAME_TYPE = 0x08;
+
+    uint8_t   type;
+    uint8_t   flags;
+    uint16_t  duration;
+    uint8_t   receiver[6];     // destination
+    uint8_t   transmitter[6];  // bssid
+    uint8_t   source[6];
+    uint16_t  seq;
+} __attribute__((__packed__));
+
 typedef struct
 {
     int pwr;
@@ -47,6 +60,7 @@ Stat;
 
 typedef struct ieee80211_radiotap_header RadiotapHdr;
 typedef struct beacon_frame BeaconFrame;
+typedef struct data_frame DataFrame;
 typedef struct Mac Mac;
 
 static std::map<Mac, Stat> map;

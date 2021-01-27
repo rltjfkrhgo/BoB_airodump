@@ -10,24 +10,42 @@ void airodump(const u_char* packet, u_int len)
 
     uint8_t type = *(packet+offset);
 
-    if(type != BeaconFrame::BEACON_FRAME_TYPE)
-        return;
-
     // Beacon Frame processing...
-    BeaconFrame* beacon = (BeaconFrame*)(packet+offset);
-    Mac bssid(beacon->bssid);
+    if(type == BeaconFrame::BEACON_FRAME_TYPE)
+    {
+        BeaconFrame* beacon = (BeaconFrame*)(packet+offset);
+        Mac bssid(beacon->transmitter);
 
-    auto iter = map.find(bssid);
-    if(iter == map.end())  // 없다면
-    {
-        Stat* ptr = &map[bssid];
-        ptr->beacons++;
-        memcpy(ptr->ssid, &(beacon->ssid), beacon->len);
-        ptr->ssid[beacon->len] = '\0';
+        auto iter = map.find(bssid);
+        if(iter == map.end())  // 없다면
+        {
+            Stat* ptr = &map[bssid];
+            ptr->beacons++;
+            memcpy(ptr->ssid, &(beacon->ssid), beacon->len);
+            ptr->ssid[beacon->len] = '\0';
+        }
+        else
+        {
+            iter->second.beacons++;
+        }
     }
-    else
+
+    // Data Frame processing...
+    else if(type | DataFrame::DATA_FRAME_TYPE)
     {
-        iter->second.beacons++;
+        DataFrame* data = (DataFrame*)(packet+offset);
+        Mac bssid(data->transmitter);
+
+        auto iter = map.find(bssid);
+        if(iter == map.end())  // 없다면
+        {
+            Stat* ptr = &map[bssid];
+            ptr->data++;
+        }
+        else
+        {
+            iter->second.data++;
+        }
     }
 }
 
