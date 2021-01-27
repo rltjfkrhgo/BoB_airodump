@@ -38,6 +38,9 @@ struct beacon_frame
 
 typedef struct
 {
+    int pwr;
+    int beacons;
+    int data;
     char ssid[256];
 }
 Stat;

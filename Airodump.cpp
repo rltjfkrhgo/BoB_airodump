@@ -21,20 +21,25 @@ void airodump(const u_char* packet, u_int len)
     if(iter == map.end())  // 없다면
     {
         Stat* ptr = &map[bssid];
+        ptr->beacons++;
         memcpy(ptr->ssid, &(beacon->ssid), beacon->len);
         ptr->ssid[beacon->len] = '\0';
     }
     else
     {
-
+        iter->second.beacons++;
     }
 }
 
 void display()
 {
-    std::cout << "BSSID\t\t\tESSID\n";
+    system("clear");
+    std::cout << "BSSID\t\t\tBeacons\tESSID\n";
     for(auto it = map.begin(); it != map.end(); it++)
     {
-        std::cout << std::string(it->first) << "\t" << it->second.ssid << std::endl;
+        std::cout << 
+        std::string(it->first) << "\t" << 
+        it->second.beacons << "\t" << 
+        it->second.ssid << std::endl;
     }
 }
