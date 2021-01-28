@@ -1,7 +1,6 @@
 // Airodump.cpp
 
 #include "Airodump.h"
-#include <iostream>
 
 void airodump(const u_char* packet, u_int len)
 {
@@ -16,7 +15,7 @@ void airodump(const u_char* packet, u_int len)
         BeaconFrame* beacon = (BeaconFrame*)(packet+offset);
         Mac bssid(beacon->bssid);
 
-        Stat* ptr = &map[bssid];
+        Stat* ptr = &apMap[bssid];
         ptr->beacons++;
         memcpy(ptr->ssid, &(beacon->ssid), beacon->len);
         ptr->ssid[beacon->len] = '\0';
@@ -25,34 +24,28 @@ void airodump(const u_char* packet, u_int len)
     // Data Frame processing...
     else if(type & DataFrame::TYPE)
     {
-        if(type == DataFrame::SUBTYPE_NULL)
+        if(type == DataFrame::SUBTYPE_NULL ||
+           type == DataFrame::SUBTYPE_QOS_NULL)
             return;
 
         DataFrame* data = (DataFrame*)(packet+offset);
         Mac reciever(data->receiver);
         Mac transmitter(data->transmitter);
 
-        Stat* ptr = &map[transmitter];
+        Stat* ptr = &apMap[transmitter];
         ptr->data++;
-        ptr = &map[reciever];
+        ptr = &apMap[reciever];
         ptr->data++;
     }
 }
 
 void* display(void* ptr)
 {
-    time_t  prev = time(NULL);
-
     while(true)
     {
-        time_t  now = time(NULL);
-        if(now - prev < 1)
-            continue;
-
-        prev = now;  // 시간 갱신
         system("clear");
         printf("BSSID              Beacons  #Data  ESSID\n\n");
-        for(auto it = map.begin(); it != map.end(); it++)
+        for(auto it = apMap.begin(); it != apMap.end(); it++)
         {
             printf("%s  %7d  %5d  %s\n", 
             std::string(it->first).c_str(), 
@@ -60,5 +53,6 @@ void* display(void* ptr)
             it->second.data, 
             it->second.ssid);
         }
+        usleep(500000);
     }
 }

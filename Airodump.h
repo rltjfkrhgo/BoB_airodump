@@ -2,7 +2,9 @@
 
 #pragma once
 
+#include <iostream>
 #include <map>
+#include <unistd.h>
 #include "mac.h"
 
 struct ieee80211_radiotap_header {
@@ -41,6 +43,7 @@ struct data_frame
     const static uint8_t TYPE = 0x08;
     const static uint8_t SUBTYPE_NULL = 0x48;
     const static uint8_t SUBTYPE_QOS = 0x88;
+    const static uint8_t SUBTYPE_QOS_NULL = 0xc8;
 
     uint8_t   type;
     uint8_t   flags;
@@ -53,20 +56,29 @@ struct data_frame
 
 typedef struct
 {
-    int pwr;
-    int beacons;
-    int data;
-    char ssid[256];
+    int   pwr;
+    int   beacons;
+    int   data;
+    char  bssid[256];
 }
-Stat;
+apValue;
+
+typedef struct
+{
+    int   pwr;
+    int   frames;
+    char  bssid[256];
+    char  station[256];
+}
+staValue;
 
 typedef struct ieee80211_radiotap_header RadiotapHdr;
 typedef struct beacon_frame BeaconFrame;
 typedef struct data_frame DataFrame;
 typedef struct Mac Mac;
 
-static std::map<Mac, Stat> map;
+static std::map<Mac, apValue> apMap;
+static std::map<Mac, staValue> staMap;
 
 void airodump(const u_char* packet, u_int len);
-
 void* display(void* ptr);
