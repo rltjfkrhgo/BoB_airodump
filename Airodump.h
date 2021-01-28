@@ -14,7 +14,7 @@ struct ieee80211_radiotap_header {
 
 struct beacon_frame
 {
-    const static uint8_t BEACON_FRAME_TYPE = 0x80;
+    const static uint8_t TYPE = 0x80;
 
     uint8_t   type;
     uint8_t   flags;
@@ -38,14 +38,16 @@ struct beacon_frame
 
 struct data_frame
 {
-    const static uint8_t DATA_FRAME_TYPE = 0x08;
+    const static uint8_t TYPE = 0x08;
+    const static uint8_t SUBTYPE_NULL = 0x48;
+    const static uint8_t SUBTYPE_QOS = 0x88;
 
     uint8_t   type;
     uint8_t   flags;
     uint16_t  duration;
     uint8_t   receiver[6];     // destination
-    uint8_t   transmitter[6];  // bssid
-    uint8_t   source[6];
+    uint8_t   transmitter[6];  // 
+    uint8_t   source[6];       // source destination 왔다갔다 함
     uint16_t  seq;
 } __attribute__((__packed__));
 

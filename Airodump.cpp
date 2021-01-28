@@ -11,7 +11,7 @@ void airodump(const u_char* packet, u_int len)
     uint8_t type = *(packet+offset);
 
     // Beacon Frame processing...
-    if(type == BeaconFrame::BEACON_FRAME_TYPE)
+    if(type == BeaconFrame::TYPE)
     {
         BeaconFrame* beacon = (BeaconFrame*)(packet+offset);
         Mac bssid(beacon->bssid);
@@ -23,12 +23,18 @@ void airodump(const u_char* packet, u_int len)
     }
 
     // Data Frame processing...
-    else if(type & DataFrame::DATA_FRAME_TYPE)
+    else if(type & DataFrame::TYPE)
     {
-        DataFrame* data = (DataFrame*)(packet+offset);
-        Mac bssid(data->transmitter);
+        if(type == DataFrame::SUBTYPE_NULL)
+            return;
 
-        Stat* ptr = &map[bssid];
+        DataFrame* data = (DataFrame*)(packet+offset);
+        Mac reciever(data->receiver);
+        Mac transmitter(data->transmitter);
+
+        Stat* ptr = &map[transmitter];
+        ptr->data++;
+        ptr = &map[reciever];
         ptr->data++;
     }
 }
@@ -45,14 +51,14 @@ void* display(void* ptr)
 
         prev = now;  // 시간 갱신
         system("clear");
-        std::cout << "BSSID\t\tBeacons\t#Data\tESSID\n" << std::endl;
+        printf("BSSID              Beacons  #Data  ESSID\n\n");
         for(auto it = map.begin(); it != map.end(); it++)
         {
-            std::cout << 
-            std::string(it->first) << "  " << 
-            it->second.beacons << "\t" << 
-            it->second.data << "\t" << 
-            it->second.ssid << std::endl;
+            printf("%s  %7d  %5d  %s\n", 
+            std::string(it->first).c_str(), 
+            it->second.beacons, 
+            it->second.data, 
+            it->second.ssid);
         }
     }
 }
