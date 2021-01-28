@@ -66,4 +66,5 @@ typedef struct Mac Mac;
 static std::map<Mac, Stat> map;
 
 void airodump(const u_char* packet, u_int len);
-void display();
+
+void* display(void* ptr);

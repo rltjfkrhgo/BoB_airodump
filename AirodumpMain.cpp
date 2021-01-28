@@ -2,6 +2,7 @@
 
 #include <pcap.h>
 #include <stdio.h>
+#include <pthread.h>
 #include "Airodump.h"
 
 void usage() {
@@ -24,9 +25,11 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    time_t  prev = time(NULL);
+    pthread_t displayThread;
+    pthread_create(&displayThread, NULL, display, NULL);
 
-    while (true) {
+    while (true)
+    {
         struct pcap_pkthdr* header;
         const u_char* packet;
         int res = pcap_next_ex(handle, &header, &packet);  // 패킷 수신
@@ -36,14 +39,8 @@ int main(int argc, char* argv[]) {
             break;
         }
         airodump(packet, header->caplen);
-
-        time_t  now = time(NULL);
-        if(now - prev > 1)
-        {
-            display();
-            prev = now;
-        }
     }
-    
+
+    pthread_join(displayThread, NULL);
     pcap_close(handle);
 }
