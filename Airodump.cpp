@@ -5,9 +5,9 @@
 void airodump(const u_char* packet, u_int len)
 {
     RadiotapHdr* radiotapHdr = (RadiotapHdr*)packet;
-    int offset = radiotapHdr->it_len;
-
-    uint8_t type = *(packet+offset);
+    int      offset = radiotapHdr->it_len;
+    int8_t   power = packet[offset-2];
+    uint8_t  type = *(packet+offset);
 
     // Beacon Frame processing...
     if(type == BeaconFrame::TYPE)
@@ -17,6 +17,7 @@ void airodump(const u_char* packet, u_int len)
 
         apValue* ptr = &apMap[apMac];
         ptr->beacons++;
+        ptr->pwr = power;
         memcpy(ptr->bssid, &(beacon->ssid), beacon->len);
         ptr->bssid[beacon->len] = '\0';
     }
@@ -35,6 +36,7 @@ void airodump(const u_char* packet, u_int len)
         {
             staValue* staPtr = &staMap[transmitter];
             staPtr->frames++;
+            staPtr->pwr = power;
             staPtr->bssid = reciever;
 
             if(type == DataFrame::SUBTYPE_NULL ||
@@ -51,6 +53,7 @@ void airodump(const u_char* packet, u_int len)
         {
             apValue* apPtr = &apMap[transmitter];
             apPtr->data++;
+            apPtr->pwr = power;
 
             if(isMulticast(reciever) ||
                isBroadcast(reciever))
@@ -68,21 +71,23 @@ void* display(void* ptr)
     while(true)
     {
         system("clear");
-        printf("\nBSSID              Beacons  #Data  ESSID\n\n");
+        printf("\nBSSID              PWR  Beacons  #Data  ESSID\n\n");
         for(auto it = apMap.begin(); it != apMap.end(); it++)
         {
-            printf("%s  %7d  %5d  %s\n", 
+            printf("%s  %3d  %7d  %5d  %s\n", 
             std::string(it->first).c_str(), 
+            it->second.pwr, 
             it->second.beacons, 
             it->second.data, 
             it->second.bssid);
         }
-        printf("\nBSSID              STATION            Frames\n\n");
+        printf("\nBSSID              STATION            PWR  Frames\n\n");
         for(auto it = staMap.begin(); it != staMap.end(); it++)
         {
-            printf("%s  %s  %6d\n", 
+            printf("%s  %s  %3d %6d\n", 
             std::string(it->first).c_str(), 
             std::string(it->second.bssid).c_str(), 
+            it->second.pwr, 
             it->second.frames);
         }
         usleep(500000);
