@@ -45,6 +45,9 @@ struct data_frame
     const static uint8_t SUBTYPE_QOS = 0x88;
     const static uint8_t SUBTYPE_QOS_NULL = 0xc8;
 
+    const static uint8_t FLAG_TO_DS = 0x1;
+    const static uint8_t FLAG_FROM_DS = 0x2;
+
     uint8_t   type;
     uint8_t   flags;
     uint16_t  duration;
@@ -67,8 +70,7 @@ typedef struct
 {
     int   pwr;
     int   frames;
-    char  bssid[256];
-    char  station[256];
+    Mac   bssid;   // AP의 MAC
 }
 staValue;
 
@@ -82,3 +84,6 @@ static std::map<Mac, staValue> staMap;
 
 void airodump(const u_char* packet, u_int len);
 void* display(void* ptr);
+
+bool isMulticast(const Mac& mac);
+bool isBroadcast(const Mac& mac);
